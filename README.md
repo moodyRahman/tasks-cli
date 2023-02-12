@@ -29,8 +29,7 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`tasks-cli hello PERSON`](#tasks-cli-hello-person)
-* [`tasks-cli hello world`](#tasks-cli-hello-world)
+* [`tasks-cli auth [FILE]`](#tasks-cli-auth-file)
 * [`tasks-cli help [COMMANDS]`](#tasks-cli-help-commands)
 * [`tasks-cli plugins`](#tasks-cli-plugins)
 * [`tasks-cli plugins:install PLUGIN...`](#tasks-cli-pluginsinstall-plugin)
@@ -42,45 +41,29 @@ USAGE
 * [`tasks-cli plugins:uninstall PLUGIN...`](#tasks-cli-pluginsuninstall-plugin-2)
 * [`tasks-cli plugins update`](#tasks-cli-plugins-update)
 
-## `tasks-cli hello PERSON`
+## `tasks-cli auth [FILE]`
 
-Say hello
+describe the command here
 
 ```
 USAGE
-  $ tasks-cli hello [PERSON] -f <value>
+  $ tasks-cli auth [FILE] [-n <value>] [-f]
 
 ARGUMENTS
-  PERSON  Person to say hello to
+  FILE  file to read
 
 FLAGS
-  -f, --from=<value>  (required) Who is saying hello
+  -f, --force
+  -n, --name=<value>  name to print
 
 DESCRIPTION
-  Say hello
+  describe the command here
 
 EXAMPLES
-  $ oex hello friend --from oclif
-  hello friend from oclif! (./src/commands/hello/index.ts)
+  $ tasks-cli auth
 ```
 
-_See code: [dist/commands/hello/index.ts](https://github.com/moodyRahman/hello-world/blob/v0.0.0/dist/commands/hello/index.ts)_
-
-## `tasks-cli hello world`
-
-Say hello world
-
-```
-USAGE
-  $ tasks-cli hello world
-
-DESCRIPTION
-  Say hello world
-
-EXAMPLES
-  $ tasks-cli hello world
-  hello world! (./src/commands/hello/world.ts)
-```
+_See code: [dist/commands/auth.ts](https://github.com/moodyRahman/hello-world/blob/v0.0.0/dist/commands/auth.ts)_
 
 ## `tasks-cli help [COMMANDS]`
 
