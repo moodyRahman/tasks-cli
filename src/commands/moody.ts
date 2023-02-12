@@ -1,30 +1,30 @@
-import {Args, Command, Flags} from '@oclif/core'
+import { Args, Command, Flags } from "@oclif/core";
 
 export default class Moody extends Command {
-  static description = 'describe the command here'
+  static description = "describe the command here";
 
-  static examples = [
-    '<%= config.bin %> <%= command.id %>',
-  ]
+  static examples = ["<%= config.bin %> <%= command.id %>"];
 
   static flags = {
     // flag with a value (-n, --name=VALUE)
-    name: Flags.string({char: 'n', description: 'name to print'}),
+    name: Flags.string({ char: "n", description: "name to print" }),
     // flag with no value (-f, --force)
-    force: Flags.boolean({char: 'f'}),
-  }
+    force: Flags.boolean({ char: "f" }),
+  };
 
   static args = {
-    file: Args.string({description: 'file to read'}),
-  }
+    file: Args.string({ description: "file to read" }),
+  };
 
   public async run(): Promise<void> {
-    const {args, flags} = await this.parse(Moody)
+    const { args, flags } = await this.parse(Moody);
 
-    const name = flags.name ?? 'world'
-    this.log(`hello ${name} from /home/moody/projects/node/tasks-cli/src/commands/moody.ts`)
+    const name = flags.name ?? "world";
+    this.log(
+      `hello ${name} from /home/moody/projects/node/tasks-cli/src/commands/moody.ts`
+    );
     if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`)
+      this.log(`you input --force and --file: ${args.file}`);
     }
   }
 }
