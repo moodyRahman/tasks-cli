@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 secrets.json
 tasks-cli
 .env
+.tasks.config.json
