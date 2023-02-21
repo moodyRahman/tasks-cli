@@ -4,7 +4,12 @@ import { randomBytes, createHash } from "crypto";
 import { writeFile } from "fs/promises";
 import * as hbs from "hbs";
 import open from "open";
-import path from "path";
+import * as dotenv from "dotenv";
+
+dotenv.config({
+  path: __dirname + "/../../../.env",
+  debug: true,
+});
 
 export default class Auth extends Command {
   static description = "describe the command here";
@@ -37,7 +42,8 @@ export default class Auth extends Command {
       .digest("base64url");
     const nonce: string = randomBytes(100).toString("base64url");
 
-    console.log(hash);
+    console.log(process.env.GOOGLE_OUATH_SECRET);
+    console.log(process.env.GOOGLE_OAUTH_ID);
 
     new Promise((resolve) => {
       const app: Express = express();
@@ -58,13 +64,17 @@ export default class Auth extends Command {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({}),
+          body: JSON.stringify({
+            client_id: process.env.GOOGLE_OAUTH_ID,
+            client_secret: process.env.GOOGLE_OAUTH_SECRET,
+          }),
         });
         res.render("oauth");
       });
 
       app.get("/login", (req: Request, res: Response) => {
         res.render("login.html", {
+          client_id: process.env.GOOGLE_OAUTH_ID,
           code_challenge: hash,
           nonce: nonce,
         });

@@ -10,3 +10,4 @@ oclif.manifest.json
 tsconfig.tsbuildinfo
 secrets.json
 tasks-cli
+.env
