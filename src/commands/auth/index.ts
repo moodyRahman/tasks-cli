@@ -1,5 +1,8 @@
 import { Args, Command, Flags } from "@oclif/core";
 import express, { Express, Request, Response } from "express";
+import { randomBytes, createHash } from "crypto";
+import { writeFile } from "fs/promises";
+import * as hbs from "hbs";
 import open from "open";
 import path from "path";
 
@@ -28,7 +31,13 @@ export default class Auth extends Command {
     //   this.log(`you input --force and --file: ${args.file}`)
     // }
 
-    new Promise((resolve, reject) => {
+    const verifier: Buffer = randomBytes(50);
+    const hash: string = createHash("sha256")
+      .update(verifier)
+      .digest("base64url");
+    const nonce: string = randomBytes(100).toString("base64url");
+
+    console.log(hash);
       const app: Express = express();
       app.use(express.json());
       app.use(express.urlencoded({ extended: false }));
