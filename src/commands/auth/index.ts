@@ -38,22 +38,36 @@ export default class Auth extends Command {
     const nonce: string = randomBytes(100).toString("base64url");
 
     console.log(hash);
+
+    new Promise((resolve) => {
       const app: Express = express();
       app.use(express.json());
       app.use(express.urlencoded({ extended: false }));
+      app.set("view engine", "html");
+      app.engine("html", hbs.__express);
+      app.set("views", __dirname + "/../../oauth");
 
       const server = app.listen(31417, () => {
         console.log(`Example app listening on port 31417`);
       });
 
-      app.get("/", (req: Request, res: Response) => {
-        res.sendFile(path.join(__dirname, "../../oauth/index.html"));
+      app.get("/", async (req: Request, res: Response) => {
+        console.log(req.query);
+        const goog_res = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+        });
+        res.render("oauth");
       });
 
-      app.get("/oauth", (req: Request, res: Response) => {
-        console.log();
-        console.log("m");
-        res.sendFile(path.join(__dirname, "../../oauth/oauth.html"));
+      app.get("/login", (req: Request, res: Response) => {
+        res.render("login.html", {
+          code_challenge: hash,
+          nonce: nonce,
+        });
       });
 
       app.get("/kill", (req: Request, res: Response) => {
@@ -62,7 +76,7 @@ export default class Auth extends Command {
         resolve("");
       });
 
-      open("http://localhost:31417");
+      open("http://localhost:31417/login");
     }).then(() => {
       console.log("killed");
     });
