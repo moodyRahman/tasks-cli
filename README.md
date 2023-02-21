@@ -20,7 +20,7 @@ $ npm install -g tasks-cli
 $ tasks-cli COMMAND
 running command...
 $ tasks-cli (--version)
-tasks-cli/0.0.0 linux-x64 node-v19.6.0
+tasks-cli/0.0.0 linux-x64 node-v18.9.1
 $ tasks-cli --help [COMMAND]
 USAGE
   $ tasks-cli COMMAND
@@ -29,7 +29,6 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`tasks-cli auth [FILE]`](#tasks-cli-auth-file)
 * [`tasks-cli help [COMMANDS]`](#tasks-cli-help-commands)
 * [`tasks-cli plugins`](#tasks-cli-plugins)
 * [`tasks-cli plugins:install PLUGIN...`](#tasks-cli-pluginsinstall-plugin)
@@ -40,30 +39,6 @@ USAGE
 * [`tasks-cli plugins:uninstall PLUGIN...`](#tasks-cli-pluginsuninstall-plugin-1)
 * [`tasks-cli plugins:uninstall PLUGIN...`](#tasks-cli-pluginsuninstall-plugin-2)
 * [`tasks-cli plugins update`](#tasks-cli-plugins-update)
-
-## `tasks-cli auth [FILE]`
-
-describe the command here
-
-```
-USAGE
-  $ tasks-cli auth [FILE] [-n <value>] [-f]
-
-ARGUMENTS
-  FILE  file to read
-
-FLAGS
-  -f, --force
-  -n, --name=<value>  name to print
-
-DESCRIPTION
-  describe the command here
-
-EXAMPLES
-  $ tasks-cli auth
-```
-
-_See code: [dist/commands/auth.ts](https://github.com/moodyRahman/hello-world/blob/v0.0.0/dist/commands/auth.ts)_
 
 ## `tasks-cli help [COMMANDS]`
 
