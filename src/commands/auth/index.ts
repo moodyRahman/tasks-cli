@@ -12,7 +12,7 @@ dotenv.config({
 });
 
 export default class Auth extends Command {
-  static description = "describe the command here";
+  static description = "authenticate tasks-cli";
 
   static examples = ["<%= config.bin %> <%= command.id %>"];
 
@@ -21,6 +21,7 @@ export default class Auth extends Command {
     // name: Flags.string({ char: "n", description: "name to print" }),
     // // flag with no value (-f, --force)
     // force: Flags.boolean({ char: "f" }),
+    config_dir: Flags.string(),
   };
 
   static args = {
@@ -28,23 +29,26 @@ export default class Auth extends Command {
   };
 
   public async run(): Promise<void> {
-    // const {args, flags} = await this.parse(Auth)
+    const { flags } = await this.parse(Auth);
 
-    // const name = flags.name ?? 'world'
+    const config_dir = flags.config_dir ?? "./.tasks.config.json";
     // this.log(`hello ${name} from /home/moody/projects/node/tasks-cli/src/commands/auth.ts`)
     // if (args.file && flags.force) {
     //   this.log(`you input --force and --file: ${args.file}`)
     // }
 
-    const verifier: Buffer = randomBytes(50);
+    // generate code challenge and nonce for oauth
+    const verifier: string = randomBytes(50).toString("hex");
     const hash: string = createHash("sha256")
       .update(verifier)
       .digest("base64url");
     const nonce: string = randomBytes(100).toString("base64url");
 
-    console.log(process.env.GOOGLE_OUATH_SECRET);
-    console.log(process.env.GOOGLE_OAUTH_ID);
-
+    /**
+    so this is pretty interesting, by wrapping express around a Promise, i can
+    keep a server running indefinitely until I call a kill route, thus unblocking
+    the program and proceeding with whatever needs to be done next
+     */
     new Promise((resolve) => {
       const app: Express = express();
       app.use(express.json());
@@ -54,24 +58,10 @@ export default class Auth extends Command {
       app.set("views", __dirname + "/../../oauth");
 
       const server = app.listen(31417, () => {
-        console.log(`Example app listening on port 31417`);
+        console.log(`Starting authentication server...`);
       });
 
-      app.get("/", async (req: Request, res: Response) => {
-        console.log(req.query);
-        const goog_res = await fetch("https://oauth2.googleapis.com/token", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            client_id: process.env.GOOGLE_OAUTH_ID,
-            client_secret: process.env.GOOGLE_OAUTH_SECRET,
-          }),
-        });
-        res.render("oauth");
-      });
-
+      // inital page with login button
       app.get("/login", (req: Request, res: Response) => {
         res.render("login.html", {
           client_id: process.env.GOOGLE_OAUTH_ID,
@@ -80,15 +70,35 @@ export default class Auth extends Command {
         });
       });
 
-      app.get("/kill", (req: Request, res: Response) => {
-        res.send("killing");
+      // this page gets all the sensitive data
+      app.get("/", async (req: Request, res: Response) => {
+        const { code, scope, state } = req.query;
+
+        const goog_res = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            client_id: process.env.GOOGLE_OAUTH_ID,
+            client_secret: process.env.GOOGLE_OAUTH_SECRET,
+            code: code,
+            code_verifier: verifier,
+            grant_type: "authorization_code",
+            redirect_uri: "http://127.0.0.1:31417",
+          }),
+        });
+
+        const data = await goog_res.json();
+
+        await writeFile(config_dir, JSON.stringify(data));
+        res.render("oauth");
         server.close();
+        console.log("Successfully authenticated!");
         resolve("");
       });
 
       open("http://localhost:31417/login");
-    }).then(() => {
-      console.log("killed");
     });
   }
 }
