@@ -9,14 +9,14 @@ export default class Auth extends Command {
   static examples = ["<%= config.bin %> <%= command.id %>"];
 
   static flags = {
-    // flag with a value (-n, --name=VALUE)
-    name: Flags.string({ char: "n", description: "name to print" }),
-    // flag with no value (-f, --force)
-    force: Flags.boolean({ char: "f" }),
+    // // flag with a value (-n, --name=VALUE)
+    // name: Flags.string({ char: "n", description: "name to print" }),
+    // // flag with no value (-f, --force)
+    // force: Flags.boolean({ char: "f" }),
   };
 
   static args = {
-    file: Args.string({ description: "file to read" }),
+    // file: Args.string({ description: "file to read" }),
   };
 
   public async run(): Promise<void> {
@@ -30,12 +30,21 @@ export default class Auth extends Command {
 
     new Promise((resolve, reject) => {
       const app: Express = express();
-      app.get("/", (req: Request, res: Response) => {
-        res.sendFile(path.join(__dirname, "../oauth/index.html"));
+      app.use(express.json());
+      app.use(express.urlencoded({ extended: false }));
+
+      const server = app.listen(31417, () => {
+        console.log(`Example app listening on port 31417`);
       });
 
-      const server = app.listen(8443, () => {
-        console.log(`Example app listening on port 8443`);
+      app.get("/", (req: Request, res: Response) => {
+        res.sendFile(path.join(__dirname, "../../oauth/index.html"));
+      });
+
+      app.get("/oauth", (req: Request, res: Response) => {
+        console.log();
+        console.log("m");
+        res.sendFile(path.join(__dirname, "../../oauth/oauth.html"));
       });
 
       app.get("/kill", (req: Request, res: Response) => {
@@ -44,7 +53,7 @@ export default class Auth extends Command {
         resolve("");
       });
 
-      open("http://localhost:8443");
+      open("http://localhost:31417");
     }).then(() => {
       console.log("killed");
     });
