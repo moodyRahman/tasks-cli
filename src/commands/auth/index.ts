@@ -21,7 +21,7 @@ export default class Auth extends Command {
     // name: Flags.string({ char: "n", description: "name to print" }),
     // // flag with no value (-f, --force)
     // force: Flags.boolean({ char: "f" }),
-    config_dir: Flags.string(),
+    // config_dir: Flags.string(),
   };
 
   static args = {
@@ -29,9 +29,9 @@ export default class Auth extends Command {
   };
 
   public async run(): Promise<void> {
-    const { flags } = await this.parse(Auth);
+    // const { flags } = await this.parse(Auth);
 
-    const config_dir = flags.config_dir ?? "./.tasks.config.json";
+    const config_dir = "./.tasks.config.json";
     // this.log(`hello ${name} from /home/moody/projects/node/tasks-cli/src/commands/auth.ts`)
     // if (args.file && flags.force) {
     //   this.log(`you input --force and --file: ${args.file}`)
