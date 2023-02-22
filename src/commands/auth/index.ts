@@ -103,9 +103,6 @@ export default class Auth extends Command {
         };
 
         const data: OauthResponse = await goog_res.json();
-        console.log(Date.now());
-        console.log(data.expires_in);
-        console.log(data.expires_in + Date.now());
         const out = {
           ...data,
           expire_stamp: data.expires_in * 1000 + Date.now(),
