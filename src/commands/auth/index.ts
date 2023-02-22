@@ -1,4 +1,4 @@
-import { Args, Command, Flags } from "@oclif/core";
+import { Command } from "@oclif/core";
 import express, { Express, Request, Response } from "express";
 import { randomBytes, createHash } from "crypto";
 import { writeFile } from "fs/promises";
@@ -72,7 +72,7 @@ export default class Auth extends Command {
 
       // this page gets all the sensitive data
       app.get("/", async (req: Request, res: Response) => {
-        const { code, scope, state } = req.query;
+        const { code } = req.query;
 
         const goog_res = await fetch("https://oauth2.googleapis.com/token", {
           method: "POST",
@@ -89,9 +89,29 @@ export default class Auth extends Command {
           }),
         });
 
-        const data = await goog_res.json();
+        if (!goog_res.ok) {
+          console.log("oauth failed");
+          return;
+        }
 
-        await writeFile(config_dir, JSON.stringify(data));
+        type OauthResponse = {
+          access_token: string;
+          expires_in: number;
+          refresh_token: string;
+          scope: string;
+          token_type: string;
+        };
+
+        const data: OauthResponse = await goog_res.json();
+        console.log(Date.now());
+        console.log(data.expires_in);
+        console.log(data.expires_in + Date.now());
+        const out = {
+          ...data,
+          expire_stamp: data.expires_in * 1000 + Date.now(),
+        };
+
+        await writeFile(config_dir, JSON.stringify(out, null, 2));
         res.render("oauth");
         server.close();
         console.log("Successfully authenticated!");
