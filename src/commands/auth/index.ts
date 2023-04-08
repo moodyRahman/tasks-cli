@@ -5,6 +5,7 @@ import { writeFile } from "fs/promises";
 import * as hbs from "hbs";
 import open from "open";
 import * as dotenv from "dotenv";
+import * as path from "path";
 
 dotenv.config({
   path: __dirname + "/../../../.env",
@@ -31,7 +32,13 @@ export default class Auth extends Command {
   public async run(): Promise<void> {
     // const { flags } = await this.parse(Auth);
 
-    const config_dir = "./.tasks.config.json";
+    const config_dir_raw = "~/.config/tasks.config.json";
+    const config_dir = path.resolve(
+      config_dir_raw.replace(
+        /^~/,
+        process.env.HOME || process.env.USERPROFILE || ""
+      )
+    );
     // this.log(`hello ${name} from /home/moody/projects/node/tasks-cli/src/commands/auth.ts`)
     // if (args.file && flags.force) {
     //   this.log(`you input --force and --file: ${args.file}`)
@@ -102,9 +109,17 @@ export default class Auth extends Command {
           token_type: string;
         };
 
+        type Config = {
+          access_token: string;
+          refresh_token: string;
+          expire_stamp: number;
+        };
+
         const data: OauthResponse = await goog_res.json();
-        const out = {
-          ...data,
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { expires_in, scope, token_type, ...t } = data;
+        const out: Config = {
+          ...t,
           expire_stamp: data.expires_in * 1000 + Date.now(),
         };
 
