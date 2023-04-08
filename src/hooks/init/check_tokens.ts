@@ -1,37 +1,43 @@
 import { Hook } from "@oclif/core";
-import { readFile } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import { Config, RefreshResponse } from "../../types";
 
 dotenv.config({
   path: __dirname + "/./../../../.env",
 });
 
-const hook: Hook<"init"> = async function (opts) {
-  if (opts.id === "auth") {
+const hook: Hook<"prerun"> = async function (opts) {
+  // don't run any of this token validation code during auth
+  console.log(opts.Command.id);
+  if (opts.Command.id === "auth") {
     console.log("we authin");
     return;
   }
 
-  const readConfigs = async (): Promise<string | undefined> => {
+  const config_dir_raw = "~/.config/tasks.config.json";
+  const config_dir = path.resolve(
+    config_dir_raw.replace(
+      /^~/,
+      process.env.HOME || process.env.USERPROFILE || ""
+    )
+  );
+
+  console.log(config_dir);
+
+  const readConfigs = async (): Promise<Config | undefined> => {
     try {
-      const config_dir_raw = "~/.config/tasks.config.json";
-      const config_dir = path.resolve(
-        config_dir_raw.replace(
-          /^~/,
-          process.env.HOME || process.env.USERPROFILE || ""
-        )
-      );
       const data: string = (await readFile(config_dir)).toString("utf8");
-      return data;
+      const parsed = JSON.parse(data);
+      return parsed;
     } catch (error) {
       console.log("file read error, please run $./tasks-cli auth");
       this.exit();
     }
   };
 
-  const data = (await readConfigs()) as string;
-  const configs = JSON.parse(data);
+  const configs: Config = (await readConfigs()) as Config;
 
   const { expire_stamp, refresh_token } = configs;
 
@@ -52,15 +58,25 @@ const hook: Hook<"init"> = async function (opts) {
       }),
     });
 
-    const data = await res.json();
+    const data: RefreshResponse = await res.json();
     console.log(data);
+
+    const out: Config = {
+      access_token: data.access_token,
+      expire_stamp: data.expires_in * 1000 + Date.now(),
+      refresh_token: refresh_token,
+    };
+
+    await writeFile(config_dir, JSON.stringify(out, null, 2));
 
     return;
   } else {
     console.log("proceed");
   }
 
-  process.stdout.write(`example hook running ${JSON.stringify(opts.id)}\n`);
+  process.stdout.write(
+    `example hook running ${JSON.stringify(opts.Command.id)}\n`
+  );
 };
 
 export default hook;

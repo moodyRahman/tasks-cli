@@ -6,6 +6,7 @@ import * as hbs from "hbs";
 import open from "open";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import { Config, OauthResponse } from "../../types";
 
 dotenv.config({
   path: __dirname + "/../../../.env",
@@ -100,20 +101,6 @@ export default class Auth extends Command {
           console.log("oauth failed");
           return;
         }
-
-        type OauthResponse = {
-          access_token: string;
-          expires_in: number;
-          refresh_token: string;
-          scope: string;
-          token_type: string;
-        };
-
-        type Config = {
-          access_token: string;
-          refresh_token: string;
-          expire_stamp: number;
-        };
 
         const data: OauthResponse = await goog_res.json();
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
