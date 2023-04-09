@@ -25,7 +25,7 @@ const hook: Hook<"prerun"> = async function (opts) {
   // reads invalid configs
   const configs: Config = (await readConfigs(this)) as Config;
 
-  const { expire_stamp, refresh_token } = configs;
+  const { expire_stamp, refresh_token, access_token } = configs;
 
   // run the token refresh only if the access token is expired
   if (expire_stamp < Date.now()) {
@@ -55,9 +55,17 @@ const hook: Hook<"prerun"> = async function (opts) {
     await writeFile(config_dir, JSON.stringify(out, null, 2));
 
     return;
-  } else {
-    // if the access token is alright, proceed with the code
-    console.log("proceed");
+  }
+
+  // verify the access code is actually valid
+  // prevents us from writing this logic in every command
+  const res = await fetch(
+    `https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=${access_token}`
+  );
+
+  if (!res.ok) {
+    console.log("invalid access token, rerun tasks-cli auth");
+    this.exit();
   }
 };
 
