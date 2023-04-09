@@ -1,6 +1,7 @@
 import { Command } from "@oclif/core";
-import { readConfigs } from "../../utils";
+import { getConfigDir, readConfigs } from "../../utils";
 import { Config, TasksLists } from "../../types";
+import { writeFile } from "fs/promises";
 
 export default class List extends Command {
   static description = "describe the command here";
@@ -19,7 +20,8 @@ export default class List extends Command {
   };
 
   public async run(): Promise<void> {
-    const { access_token } = (await readConfigs(this)) as Config;
+    const config = (await readConfigs(this)) as Config;
+    const { access_token } = config;
 
     // const auth = new google.auth.GoogleAuth({
     //   // Scopes can be specified either as an array or as a single, space-delimited string.
@@ -57,12 +59,20 @@ export default class List extends Command {
     }
 
     const data: TasksLists = await res.json();
-    console.log(data);
 
     console.log("the following task boards are available:");
-    data.items.map((x) => {
-      console.log(x.title, "of the ID:", x.id);
+    const boards = data.items.map((x) => {
+      console.log(x.title);
+      return {
+        title: x.title,
+        id: x.id,
+      };
     });
+
+    const new_config = { ...config, boards };
+
+    const config_dir = getConfigDir();
+    await writeFile(config_dir, JSON.stringify(new_config, null, 2));
 
     return;
   }
