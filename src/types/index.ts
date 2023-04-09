@@ -19,4 +19,31 @@ type RefreshResponse = {
   token_type: string;
 };
 
-export { OauthResponse, Config, RefreshResponse };
+type TasksLists = {
+  kind: string;
+  etag: string;
+  items: TaskList[];
+};
+
+type TaskList = {
+  kind: string;
+  id: string;
+  etag: string;
+  title: string;
+  updated: string;
+  selfLink: string;
+};
+
+type Task = {
+  kind: string;
+  id: string;
+  etag: string;
+  title: string;
+  updated: string;
+  selfLink: string;
+  position: string;
+  status: string;
+  links: [];
+};
+
+export { OauthResponse, Config, RefreshResponse, TaskList, TasksLists, Task };
