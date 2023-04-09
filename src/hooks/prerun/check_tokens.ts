@@ -1,8 +1,8 @@
 import { Hook } from "@oclif/core";
-import { readFile, writeFile } from "fs/promises";
+import { writeFile } from "fs/promises";
 import * as dotenv from "dotenv";
-import * as path from "path";
 import { Config, RefreshResponse } from "../../types";
+import { getConfigDir, readConfigs } from "../../utils";
 
 dotenv.config({
   path: __dirname + "/./../../../.env",
@@ -17,28 +17,13 @@ const hook: Hook<"prerun"> = async function (opts) {
   }
 
   // resolve the location of the config file
-  const config_dir_raw = "~/.config/tasks.config.json";
-  const config_dir = path.resolve(
-    config_dir_raw.replace(
-      /^~/,
-      process.env.HOME || process.env.USERPROFILE || ""
-    )
-  );
-
-  const readConfigs = async (): Promise<Config | undefined> => {
-    try {
-      const data: string = (await readFile(config_dir)).toString("utf8");
-      const parsed = JSON.parse(data);
-      return parsed;
-    } catch (error) {
-      console.log("file read error, please run $./tasks-cli auth");
-      this.exit();
-    }
-  };
+  const config_dir = getConfigDir();
 
   // given that we throw and kill the process if there's an issue parsing the config file,
   // we can safely cast it to a Config here
-  const configs: Config = (await readConfigs()) as Config;
+  // we also pass readConfigs a reference to this so it can kill the process if it
+  // reads invalid configs
+  const configs: Config = (await readConfigs(this)) as Config;
 
   const { expire_stamp, refresh_token } = configs;
 
