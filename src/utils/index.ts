@@ -1,5 +1,5 @@
 import * as path from "path";
-import { Hook } from "@oclif/core";
+import { Hook, Command } from "@oclif/core";
 import { readFile } from "fs/promises";
 import { Config } from "../types";
 
@@ -15,7 +15,9 @@ const getConfigDir = (): string => {
   return config_dir;
 };
 
-const readConfigs = async (c: Hook.Context): Promise<Config | undefined> => {
+const readConfigs = async (
+  c: Hook.Context | Command
+): Promise<Config | undefined> => {
   try {
     const data: string = (await readFile(getConfigDir())).toString("utf8");
     const parsed = JSON.parse(data);
