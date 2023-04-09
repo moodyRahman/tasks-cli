@@ -9,13 +9,14 @@ dotenv.config({
 });
 
 const hook: Hook<"prerun"> = async function (opts) {
-  // don't run any of this token validation code during auth
+  // don't run any of this token validation code during the auth command
   console.log(opts.Command.id);
   if (opts.Command.id === "auth") {
     console.log("we authin");
     return;
   }
 
+  // resolve the location of the config file
   const config_dir_raw = "~/.config/tasks.config.json";
   const config_dir = path.resolve(
     config_dir_raw.replace(
@@ -23,8 +24,6 @@ const hook: Hook<"prerun"> = async function (opts) {
       process.env.HOME || process.env.USERPROFILE || ""
     )
   );
-
-  console.log(config_dir);
 
   const readConfigs = async (): Promise<Config | undefined> => {
     try {
@@ -37,12 +36,13 @@ const hook: Hook<"prerun"> = async function (opts) {
     }
   };
 
+  // given that we throw and kill the process if there's an issue parsing the config file,
+  // we can safely cast it to a Config here
   const configs: Config = (await readConfigs()) as Config;
 
   const { expire_stamp, refresh_token } = configs;
 
-  console.log(expire_stamp);
-
+  // run the token refresh only if the access token is expired
   if (expire_stamp < Date.now()) {
     console.log("get new tokens");
     const res = await fetch("https://oauth2.googleapis.com/token", {
@@ -59,8 +59,8 @@ const hook: Hook<"prerun"> = async function (opts) {
     });
 
     const data: RefreshResponse = await res.json();
-    console.log(data);
 
+    // generate new config and write to file and proceed with the command
     const out: Config = {
       access_token: data.access_token,
       expire_stamp: data.expires_in * 1000 + Date.now(),
@@ -71,12 +71,9 @@ const hook: Hook<"prerun"> = async function (opts) {
 
     return;
   } else {
+    // if the access token is alright, proceed with the code
     console.log("proceed");
   }
-
-  process.stdout.write(
-    `example hook running ${JSON.stringify(opts.Command.id)}\n`
-  );
 };
 
 export default hook;

@@ -61,7 +61,7 @@
       }
     },
     "hooks": {
-      "prerun": "./dist/hooks/init/check_tokens"
+      "prerun": "./dist/hooks/prerun/check_tokens"
     }
   },
   "scripts": {
