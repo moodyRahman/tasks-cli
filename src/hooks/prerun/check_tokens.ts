@@ -10,7 +10,7 @@ dotenv.config({
 
 const hook: Hook<"prerun"> = async function (opts) {
   // don't run any of this token validation code during the auth command
-  console.log(opts.Command.id);
+  // console.log(opts.Command.id);
   if (opts.Command.id === "auth") {
     console.log("we authin");
     return;
