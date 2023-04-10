@@ -8,6 +8,18 @@ dotenv.config({
   path: __dirname + "/./../../../.env",
 });
 
+process.on("warning", (warning) => {
+  // Check if the warning is related to fetch
+  if (warning.name === "FetchWarning") {
+    // You can customize how you handle the fetch warning here
+    // For example, you can console.log() the warning or simply ignore it
+    console.log("Fetch Warning:", warning.message);
+    // You can also prevent the warning from being printed to the console
+    // by calling warning.preventDefault() like this:
+    // warning.preventDefault();
+  }
+});
+
 const hook: Hook<"prerun"> = async function (opts) {
   // don't run any of this token validation code during the auth command
   // console.log(opts.Command.id);
