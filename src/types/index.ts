@@ -10,6 +10,10 @@ type Config = {
   access_token: string;
   refresh_token: string;
   expire_stamp: number;
+  boards?: {
+    title: string;
+    id: string;
+  }[];
 };
 
 type RefreshResponse = {

@@ -24,11 +24,24 @@ export default class ListGet extends Command {
   };
 
   public async run(): Promise<void> {
-    const { access_token } = (await readConfigs(this)) as Config;
+    const config = (await readConfigs(this)) as Config;
+    const { access_token } = config;
     const { args } = await this.parse(ListGet);
 
+    if (!("boards" in config)) {
+      console.log('run "tasks-cli list" before trying to access a board');
+      return;
+    }
+
+    const id = config.boards?.find((x) => x.title === args.board);
+
+    if (id === undefined) {
+      console.log(`${args.board} not found`);
+      return;
+    }
+
     const res = await fetch(
-      `https://tasks.googleapis.com/tasks/v1/lists/${args.board}/tasks`,
+      `https://tasks.googleapis.com/tasks/v1/lists/${id?.id}/tasks`,
       {
         method: "GET",
         headers: {
