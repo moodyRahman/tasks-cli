@@ -1,3 +1,6 @@
+# tasks-cli
+## A simple command line interface to interact with Google Tasks
+## Getting started
 <!-- usage -->
 ```sh-session
 $ npm install -g tasks-cli
@@ -10,6 +13,13 @@ USAGE
   $ tasks-cli COMMAND
 ...
 ```
+Initialize `tasks-cli` by first running
+```tasks-cli auth``` to open your browser and enter your Google Oauth credentials.   
+Once you're authenticated, run ```tasks-cli list``` to display and cache the task 
+boards you have available right now.  
+Finally, run ```tasks-cli list get "<board>"``` to display all the tasks 
+associated to the `<board>`
+
 <!-- usagestop -->
 # Commands
 <!-- commands -->
